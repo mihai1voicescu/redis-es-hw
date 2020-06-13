@@ -1,0 +1,193 @@
+# ~~~HW 1~~~ #
+#         What is sharding and why is it used in ES
+# Sharding refers to using more than one physical device to store data.
+# There are 2 types of shards: primaries and replicas.
+# Primary shards share the data between them, each having different documents.
+# These are used to shorten the processing time for documents on one shard.
+# Replicas hold copies of the content of the primary shards and are used so
+# that the information won't be lost in case one of the primary shards fail
+# and the system will continue to work using one of the copies.
+# Having more primary shards also reduces the damage of losing the content of
+# one shard since not all information will be lost.
+
+# ~~~HW 3~~~ #
+
+# get the week with the biggest sales
+GET kibana_sample_data_ecommerce/_search?size=0
+{
+    "aggs": {
+        "week_sales": {
+            "date_histogram": {
+                "field": "order_date",
+                "interval": "week",
+                "format": "yyyy-MM-dd"
+            },
+            "aggs": {
+              "total_sales": {
+                "sum": {
+                  "field": "taxful_total_price"
+                }
+              },
+              "final_sort": {
+                "bucket_sort": {
+                  "sort": [
+                    {"total_sales": {"order": "desc"}}
+                  ],
+                "size": 1
+                }
+              }
+            }
+        }
+    }
+}
+
+# get the day with the biggest sales
+GET kibana_sample_data_ecommerce/_search?size=0
+{
+    "aggs": {
+        "day_sales": {
+            "date_histogram": {
+                "field": "order_date",
+                "interval": "day",
+                "format": "yyyy-MM-dd"
+            },
+            "aggs": {
+              "total_sales": {
+                "sum": {
+                  "field": "taxful_total_price"
+                }
+              },
+              "final_sort": {
+                "bucket_sort": {
+                  "sort": [
+                    {"total_sales": {"order": "desc"}}
+                  ],
+                "size": 1
+                }
+              }
+            }
+        }
+    }
+}
+
+# get the continent with the biggest sales
+GET kibana_sample_data_ecommerce/_search?size=0
+{
+    "aggs": {
+        "continent_sales": {
+            "terms": {
+              "field": "geoip.continent_name"
+            },
+            "aggs": {
+              "total_sales": {
+                "sum": {
+                  "field": "taxful_total_price"
+                }
+              },
+              "final_sort": {
+                "bucket_sort": {
+                  "sort": [
+                    {"total_sales": {"order": "desc"}}
+                  ],
+                "size": 1
+                }
+              }
+            }
+        }
+    }
+}
+
+# get the best selling day of the week
+GET kibana_sample_data_ecommerce/_search?size=0
+{
+    "aggs": {
+        "weekday_sales": {
+            "terms": {
+                "field": "day_of_week"
+            },
+            "aggs": {
+              "total_sales": {
+                "sum": {
+                  "field": "taxful_total_price"
+                }
+              },
+              "final_sort": {
+                "bucket_sort": {
+                  "sort": [
+                    {"total_sales": {"order": "desc"}}
+                  ],
+                "size": 1
+                }
+              }
+            }
+        }
+    }
+}
+
+# find all categories
+GET kibana_sample_data_ecommerce/_search?size=0
+{
+    "aggs": {
+        "categories": {
+            "terms": {
+                "field": "products.category.keyword"
+            }
+        }
+    }
+}
+
+# get the most valuable (generated biggest revenue) product
+GET kibana_sample_data_ecommerce/_search?size=0
+{
+    "aggs": {
+        "products": {
+            "terms": {
+                "field": "products.product_name.keyword",
+                "order": {
+                  "total": "desc"
+                },
+                "size": 1
+            },
+            "aggs": {
+              "total": {
+                "sum": {
+                  "field": "products.price"
+                }
+              }
+            }
+        }
+    }
+}
+
+# get the most valuable (generated biggest revenue) product (Bonus: per category)
+
+# (Bonus) get best selling category per continent
+
+# (Bonus) get the hour of day with biggest sales
+
+# (Bonus) see if prices for products fluctuate
+
+# (Bonus) get the most valuable (generated biggest revenue) manufaturer per category
+GET kibana_sample_data_ecommerce/_search?size=0
+{
+    "aggs": {
+        "manufacturer": {
+            "terms": {
+                "field": "products.manufacturer.keyword",
+                "order": {
+                  "total": "desc"
+                },
+                "size": 1
+            },
+            "aggs": {
+              "total": {
+                "sum": {
+                  "field": "products.price"
+                }
+              }
+            }
+        }
+    }
+}
+
+# (Bonus) get the fastest growing item by quantity (qt/t_now - t_created)
