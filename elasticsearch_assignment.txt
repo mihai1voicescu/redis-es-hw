@@ -1,0 +1,257 @@
+# get the week with the biggest sales
+
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "weeks": {
+      "date_histogram": {
+        "field": "order_date",
+        "interval": "week",
+        "order": {
+          "total": "desc"
+        }
+      },
+      "aggs": {
+        "result": {
+          "top_hits": {
+            "size": 7,
+            "_source": ["order_date", "day_of_week"]
+          }
+        },
+        "total": {
+          "sum": {
+            "field": "taxful_total_price"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+# get the day with the biggest sales
+
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "days": {
+      "date_histogram": {
+        "field": "order_date",
+        "interval": "day",
+        "format": "yyyy-MM-dd",
+        "order": {
+          "total": "desc"
+        }
+      },
+      "aggs": {
+        "total": {
+          "sum": {
+            "field": "taxful_total_price"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+# get the continent with the biggest sales
+
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "continents": {
+      "terms": {
+        "field": "geoip.continent_name",
+        "order": {
+          "total": "desc"
+        }
+      },
+      "aggs": {
+        "total": {
+          "sum": {
+            "field": "taxful_total_price"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+# get the best selling day of the week
+
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "week_days": {
+      "terms": {
+        "field": "day_of_week",
+        "order": {
+          "total": "desc"
+        }
+      },
+      "aggs": {
+        "total": {
+          "sum": {
+            "field": "taxful_total_price"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+# find all categories
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "categories": {
+      "terms": {
+        "field": "category.keyword"
+      }
+    }
+  }
+}
+
+
+
+
+# get the most valuable (generated biggest revenue) product
+
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "products": {
+      "terms": {
+        "field": "products._id.keyword",
+        "order": {
+          "total": "desc"
+        }
+      },
+      "aggs": {
+        "total": {
+          "sum": {
+            "field": "products.taxful_price"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+# get the most valuable (generated biggest revenue) product per category
+
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "categories": {
+      "terms": {
+        "field": "category.keyword"
+      },
+      "aggs": {
+        "products": {
+          "terms": {
+            "field": "products._id.keyword",
+            "order": {
+              "total": "desc"
+            }
+          },
+          "aggs": {
+            "total": {
+              "sum": {
+                "field": "products.taxful_price"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+# get best selling category per continent
+
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "continents": {
+      "terms": {
+        "field": "geoip.continent_name"
+      },
+      "aggs": {
+        "categories": {
+          "terms": {
+            "field": "category.keyword",
+            "order": {
+              "total": "desc"
+            }
+          },
+          "aggs": {
+            "total": {
+              "sum": {
+                "field": "taxful_total_price"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+# get the hour of day with biggest sales
+
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "hours": {
+      "date_histogram": {
+        "field": "order_date",
+        "interval": "hour",
+        "order": {
+          "total": "desc"
+        }
+      },
+      "aggs": {
+        "total": {
+          "sum": {
+            "field": "taxful_total_price"
+          }
+        }
+      }
+    }
+  }
+}
+
