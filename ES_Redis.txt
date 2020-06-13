@@ -1,0 +1,146 @@
+# ~~~HW 1~~~ #
+    What is sharding and why is it used in ES?
+    Sharding is used in ES because it helps its scalability. If the size of an
+index exceeds the hardware limits of a single node, sharding comes to the rescue.
+Sharding solves this problem by dividing indices into smaller pieces named shards.
+It is a way to distribute data across multiple nodes within a cluster.
+
+
+# ~~~HW 3~~~ #
+# get the week with the biggest sales
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "sales_week": {
+      "date_histogram": {
+        "field": "order_date",
+        "interval": "week",
+        "order": {
+          "total": "desc"
+        }
+      },
+      "aggs": {
+        "total": {
+          "sum": {
+            "field": "taxful_total_price"
+          }
+        }
+      }
+    }
+  }
+}
+
+# get the day with the biggest sales
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "sales_day": {
+      "date_histogram": {
+        "field": "order_date",
+        "interval": "day",
+        "order": {
+          "total": "desc"
+        }
+      },
+      "aggs": {
+        "total": {
+          "sum": {
+            "field": "taxful_total_price"
+          }
+        }
+      }
+    }
+  }
+}
+
+# get the continent with the biggest sales
+# -> Asia
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "sales_continent": {
+      "terms": {
+        "field": "geoip.continent_name",
+        "order": {
+          "total": "desc"
+        },
+        "size": 1
+      },
+      "aggs": {
+        "total": {
+          "sum": {
+            "field": "taxful_total_price"
+          }
+        }
+      }
+    }
+  }
+}
+
+# get the best selling day of the week
+# -> Friday
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "day_of_week": {
+      "terms": {
+        "field": "day_of_week",
+        "order": {
+          "total": "desc"
+        },
+        "size": 1
+      },
+      "aggs": {
+        "total": {
+          "sum": {
+            "field": "taxful_total_price"
+          }
+        }
+      }
+    }
+  }
+}
+
+# find all categories
+# -> Women's/Men's Clothing,
+# Women's/Men's Shoes, Women's/Men's Accessories
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "categories": {
+      "terms": {
+        "field": "category.keyword"
+      }
+    }
+  }
+}
+
+# get the most valuable (generated biggest revenue) product
+# -> Boots - black
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "product": {
+      "terms": {
+        "field": "products.product_name.keyword",
+        "order": {
+          "total": "desc"
+        },
+        "size": 1
+      },
+      "aggs": {
+        "total": {
+          "sum": {
+            "field": "products.price"
+          }
+        }
+      }
+    }
+  }
+}
