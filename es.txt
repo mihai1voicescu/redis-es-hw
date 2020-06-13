@@ -1,0 +1,205 @@
+# get the week with the biggest sales
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "weeks": {
+      "date_histogram": {
+        "field": "order_date",
+        "interval": "week"
+      },
+      "aggs": {
+        "sales_per_week": {
+          "sum": {
+            "field": "taxful_total_price"
+          }
+        },
+        "sale_sort": {
+          "bucket_sort": {
+            "sort": [{
+              "sales_per_week": {
+                "order": "desc"
+              }
+            }],
+            "size": 1
+          }
+        }
+      }
+    }
+  }
+}
+
+
+# get the day with the biggest sales
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "days": {
+      "date_histogram": {
+        "field": "order_date",
+        "interval": "day"
+      },
+      "aggs": {
+        "sales_per_day": {
+          "sum": {
+            "field": "taxful_total_price"
+          }
+        },
+        "sale_sort": {
+          "bucket_sort": {
+            "sort": [{
+              "sales_per_day": {
+                "order": "desc"
+              }
+            }],
+            "size": 1
+          }
+        }
+      }
+    }
+  }
+}
+
+
+# get the continent with the biggest sales
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "continent": {
+      "terms": {
+        "field": "geoip.continent_name"
+      },
+      "aggs": {
+        "sales_per_continent": {
+          "sum": {
+            "field": "taxful_total_price"
+          }
+        },
+        "sale_sort": {
+          "bucket_sort": {
+            "sort": [{
+              "sales_per_continent": {
+                "order": "desc"
+              }
+            }],
+            "size": 1
+          }
+        }
+      }
+    }
+  }
+}
+
+# get the best selling day of the week
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "continent": {
+      "terms": {
+        "field": "day_of_week"
+      },
+      "aggs": {
+        "sales_per_day_of_week": {
+          "sum": {
+            "field": "taxful_total_price"
+          }
+        },
+        "sale_sort": {
+          "bucket_sort": {
+            "sort": [{
+              "sales_per_day_of_week": {
+                "order": "desc"
+              }
+            }],
+            "size": 1
+          }
+        }
+      }
+    }
+  }
+}
+
+
+# find all categories
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "categories": {
+      "terms": {
+        "field": "category.keyword"
+      }
+    }
+  }
+}
+
+
+# get the most valuable (generated biggest revenue) product (Bonus: per category)
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "order": {
+      "terms": {
+        "field": "products.product_id",
+        "size": 1,
+        "order": {
+          "total": "desc"
+        }
+      },
+      "aggs": {
+        "results": {
+          "top_hits": {
+            "size": 1,
+            "_source": ["products.product_name"]
+          }
+        },
+        "total": {
+          "sum": {
+            "field": "products.taxful_price"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+# get the best selling category per continent
+GET kibana_sample_data_ecommerce/_search
+{
+  "size": 0,
+  "aggs": {
+    "continent": {
+      "terms": {
+        "field": "geoip.continent_name"
+      },
+    "aggs": {
+      "category_continent": {
+        "terms": {
+          "field": "category.keyword"
+        },
+        "aggs": {
+          "total": {
+            "sum": {
+              "field": "taxful_total_price"
+            }
+          },
+          "sale_sort": {
+          "bucket_sort": {
+            "sort": [{
+              "total": {
+                "order": "desc"
+              }
+            }],
+            "size": 1
+          }
+          }
+        }
+      }
+    }
+    }
+  }
